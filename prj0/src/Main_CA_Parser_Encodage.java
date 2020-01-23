@@ -60,8 +60,8 @@ public class Main_CA_Parser_Encodage {
 		     * 
 		     */
 			
-			Path logFile = Paths.get("log");
-
+			Path logFile = Paths.get(properties.getProperty("logFile"));
+			
 	        if(!Files.exists(logFile)){
 	            try {
 					Files.createFile(logFile);
@@ -69,17 +69,8 @@ public class Main_CA_Parser_Encodage {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	              logFile.toFile().setWritable(true);
+	            logFile.toFile().setWritable(true);
 	        }
-	        else {
-	        	try {
-					Files.write(logFile, "".getBytes(), StandardOpenOption.CREATE);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	        }
-	        
 
 	        String blablabla = "blablabla";
 	        try {
