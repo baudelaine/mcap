@@ -2,7 +2,6 @@ package com.dma.nicomains;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -37,12 +36,6 @@ public class Main_CA_Parser_Encodage {
 	public static void main(String[] args){
 		// TODO Auto-generated method stub
 		
-		
-//		BasicConfigurator.configure();
-//	    Logger.getRootLogger().setLevel(Level.DEBUG);
-		
-		Path logFile = Paths.get("log");
-	
 		labelMap_FR = new HashMap<String, String>();
 		ScreenTipMap_FR = new HashMap<String, String>();
 		
@@ -61,13 +54,41 @@ public class Main_CA_Parser_Encodage {
 //				properties.load(new FileInputStream(propsFile.toFile()));
 			}
 
-			/*
-			 * 
-			 *Ecrire dans le fichier de log en mode ajout 
-			 * 
-			 */
-			String blablabla = "blablabla";
-			Files.write(logFile, blablabla.getBytes(), StandardOpenOption.APPEND);
+		    /*
+		     * 
+		     *Ecrire dans le fichier de log en mode ajout 
+		     * 
+		     */
+			
+			Path logFile = Paths.get("log");
+
+	        if(!Files.exists(logFile)){
+	            try {
+					Files.createFile(logFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	              logFile.toFile().setWritable(true);
+	        }
+	        else {
+	        	try {
+					Files.write(logFile, "".getBytes(), StandardOpenOption.CREATE);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	        
+
+	        String blablabla = "blablabla";
+	        try {
+				Files.write(logFile, blablabla.getBytes(), StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			
 			
 			Path path = Paths.get(properties.getProperty("PathToCSVDictionnary"));
