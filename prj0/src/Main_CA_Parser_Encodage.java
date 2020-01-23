@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -21,9 +20,6 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -57,11 +53,12 @@ public class Main_CA_Parser_Encodage {
 		try {
 
 			try {
-				properties.load(Main_CA_Parser_Encodage.class.getClassLoader().getResourceAsStream("config.properties"));
+				properties.load(Main_CA_Parser_Encodage.class.getClassLoader().getResourceAsStream("conf.properties"));
 			}
 			catch (NullPointerException npe) { 
-				Path propsFile = Paths.get("/opt/wks/v1/dmaNC/WebContent/res/conf.properties");
-				properties.load(new FileInputStream(propsFile.toFile()));
+				npe.printStackTrace();
+//				Path propsFile = Paths.get("/opt/wks/v1/dmaNC/WebContent/res/conf.properties");
+//				properties.load(new FileInputStream(propsFile.toFile()));
 			}
 
 			/*
@@ -69,12 +66,6 @@ public class Main_CA_Parser_Encodage {
 			 *Ecrire dans le fichier de log en mode ajout 
 			 * 
 			 */
-
-		        if(!Files.exists(logFile)){
-                		Files.createFile(logFile);
-	                	logFile.toFile().setWritable(true);
-        		}
-
 			String blablabla = "blablabla";
 			Files.write(logFile, blablabla.getBytes(), StandardOpenOption.APPEND);
 			
