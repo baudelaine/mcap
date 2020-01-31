@@ -1,6 +1,6 @@
 #!/bin/sh
 
-JAVA_HOME=/opt/JDK/jre
+JAVA_HOME=/opt/jdk/jre
 JAVA=$JAVA_HOME/bin/java
 JAR_HOME=lib
 CLASSPATH=.

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 JAR_NAME=projtec-1.0.1.jar
-JAVA_HOME=/opt/JDK
+JAVA_HOME=/opt/jdk
 JAR_HOME=lib
 CLASSPATH=.
 SOURCES=src

@@ -66,7 +66,7 @@ public class Main_CA_PublishPackage2 {
 		//Les locales utilisées sont déjà définies dans la création du Pack  création!=publication
 		
 		String cognosDispatcher = properties.getProperty("dispatcher");
-		String pathToXML = "/opt/wks/v1/dmaNC/WebContent/res/templates";
+		String pathToXML = properties.getProperty("PathToXML");;
 		String cognosLogin = properties.getProperty("login");
 		String cognosPassword = properties.getProperty("pwd");
 		String cognosNamespace = properties.getProperty("namespace");
@@ -102,7 +102,9 @@ public class Main_CA_PublishPackage2 {
 	
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			if(e != null && e.getMessage() != null){
+				System.out.println(e.getMessage());
+			}
 		}
 		finally{
 		}

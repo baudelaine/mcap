@@ -160,7 +160,9 @@ public class Main_CA_Parser_Encodage {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			if(e != null){
+				System.out.println(e.getMessage());
+			}
 		}
 		finally{
 		}		
@@ -238,7 +240,9 @@ public class Main_CA_Parser_Encodage {
 			
 		} catch (Exception e ) {
 			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			if(e != null && e.getMessage() != null){
+				System.out.println(e.getMessage());
+			}
 		}
 	
 		
