@@ -230,7 +230,7 @@ public class Main_CA_Parser_Encodage {
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				throw new Exception("Error when writing to output file.")
+				throw new Exception("Error when writing to output file.");
 			}
 			
 			// fin test writer
@@ -364,7 +364,7 @@ public class Main_CA_Parser_Encodage {
 			Files.write(logFile, printLog.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			throw new Exception("Error when writing to log file.")
+			throw new Exception("Error when writing to log file.");
 		}
 	}
 }
