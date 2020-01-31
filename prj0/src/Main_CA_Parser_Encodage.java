@@ -29,20 +29,26 @@ public class Main_CA_Parser_Encodage {
 	static Map<String, String> labelMap_FR;
 	static Map<String, String> ScreenTipMap_FR;
 	static Map<String, String> labelMap_EN;
+	static Map<String, String> ScreenTipMap_EN;
 	static Properties properties = new Properties();
+	static Path logFile = null;
+	static Boolean debug = false;
 	
-	static final Pattern pattern = Pattern.compile("[^\\w\\s\"«»\\(\\)\\[\\]\\.,!;\\{\\}%\\*/&~]\'", Pattern.UNICODE_CHARACTER_CLASS);
-
 	public static void main(String[] args){
 		// TODO Auto-generated method stub
+		
 		
 		labelMap_FR = new HashMap<String, String>();
 		ScreenTipMap_FR = new HashMap<String, String>();
 		
-		String s = properties.getProperty("ActiveLocale");
-		System.out.println("Properties : " + s);
+		labelMap_EN = new HashMap<String, String>();
+		ScreenTipMap_EN = new HashMap<String, String>();
+		
+		Boolean fr = false;
+		Boolean en = false;
 
-
+		String printLog = "";
+		
 		try {
 
 			try {
@@ -50,8 +56,6 @@ public class Main_CA_Parser_Encodage {
 			}
 			catch (NullPointerException npe) { 
 				npe.printStackTrace();
-//				Path propsFile = Paths.get("/opt/wks/v1/dmaNC/WebContent/res/conf.properties");
-//				properties.load(new FileInputStream(propsFile.toFile()));
 			}
 
 		    /*
@@ -59,8 +63,10 @@ public class Main_CA_Parser_Encodage {
 		     *Ecrire dans le fichier de log en mode ajout 
 		     * 
 		     */
+
+			logFile = Paths.get(properties.getProperty("logFile"));
 			
-			Path logFile = Paths.get(properties.getProperty("logFile"));
+			Files.deleteIfExists(logFile);
 			
 	        if(!Files.exists(logFile)){
 	            try {
@@ -71,16 +77,28 @@ public class Main_CA_Parser_Encodage {
 				}
 	            logFile.toFile().setWritable(true);
 	        }
+	        
+	        if (properties.getProperty("modeDebug").equals("true")) {
+	        	debug = true;
+	        }
+	        printLog = new java.util.Date().toString();
+	        printLog(logFile, printLog);
+	        
+			String sLocales = properties.getProperty("locales");
+			String tabLocales[] = StringUtils.split(sLocales,";");
 
-	        String blablabla = "blablabla";
-	        try {
-				Files.write(logFile, blablabla.getBytes(), StandardOpenOption.APPEND);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for (int i = 0; i < tabLocales.length; i++) {
+				if (tabLocales[i].equals("fr")) {
+					fr = true;
+					printLog = "Choosen language : fr";
+					printLog(logFile, printLog);
+				}
+				if (tabLocales[i].equals("en")) {
+					en = true;
+					printLog = "Choosen language : en";
+					printLog(logFile, printLog);
+				}
 			}
-
-			
 			
 			Path path = Paths.get(properties.getProperty("PathToCSVDictionnary"));
 			
@@ -105,14 +123,35 @@ public class Main_CA_Parser_Encodage {
 			while(results.next()) {
 				String sNomVue = results.getString("NomVue_Physique");
 				String sNomChamp = results.getString("NomChamp_Physique");
-				String sLabelfr = results.getString("Label_FR");
-				String sScreenTipfr = results.getString("Definition_FR");
+				if (fr) {
+					String sLabelfr = results.getString("Label_FR");
+					String sScreenTipfr = results.getString("Definition_FR");
+					sLabelfr = replaceSpecialChar(sLabelfr);
+					sScreenTipfr = replaceSpecialChar(sScreenTipfr);
+					labelMap_FR.put(sNomVue + '.' + sNomChamp, sLabelfr);
+					if (debug) {
+						printLog(logFile, sNomVue + '.' + sNomChamp + ", " + sLabelfr);
+					}
+					ScreenTipMap_FR.put(sNomVue + '.' + sNomChamp, sScreenTipfr);
+					if (debug) {
+						printLog(logFile, sNomVue + '.' + sNomChamp + ", " + sScreenTipfr);
+					}
+				}
+				if (en) {
+					String sLabelen = results.getString("Label_EN");
+					String sScreenTipen = results.getString("Definition_EN");
+					sLabelen = replaceSpecialChar(sLabelen);
+					sScreenTipen = replaceSpecialChar(sScreenTipen);
+					labelMap_EN.put(sNomVue + '.' + sNomChamp, sLabelen);
+					if (debug) {
+						printLog(logFile, sNomVue + '.' + sNomChamp + ", " + sLabelen);
+					}
+					ScreenTipMap_EN.put(sNomVue + '.' + sNomChamp, sScreenTipen);
+					if (debug) {
+						printLog(logFile, sNomVue + '.' + sNomChamp + ", " + sScreenTipen);
+					}
+				}
 
-				sLabelfr = replaceSpecialChar(sLabelfr);
-
-				labelMap_FR.put(sNomVue + '.' + sNomChamp, sLabelfr);
-				ScreenTipMap_FR.put(sNomVue + '.' + sNomChamp, sScreenTipfr);
-				System.out.println(sNomVue + '.' + sNomChamp + "*****" + sLabelfr);
 			}
 			
 			if(results != null) {results.close();}
@@ -125,16 +164,15 @@ public class Main_CA_Parser_Encodage {
 		}
 		finally{
 		}		
-		
 
 		String projectName = properties.getProperty("projectName");
 		String javaModelsPath = properties.getProperty("modelsPathFromJava");
 		Path projectPath = Paths.get(javaModelsPath + "/" + projectName);
 		Charset charset = StandardCharsets.UTF_8;
 		
-		System.out.println("START XML MODIFICATION");
+		printLog(logFile, "START MODEL.XML MODIFICATIONS");
 		try {
-						
+			
 			String modelSharedPath = projectPath + "/model.xml";
 			
 			Path input = Paths.get(modelSharedPath);
@@ -169,10 +207,16 @@ public class Main_CA_Parser_Encodage {
 			}
 			
 			spath = spath + "[" + k + "]";
-			System.out.println("Find namespace : " + namespace.getStringValue());
+			
+			printLog(logFile, "Find namespace : " + namespace.getStringValue());
 
-			if (properties.getProperty("locales").contains("fr")) {
+			if (fr) {
+				printLog(logFile, "START MODEL.XML MODIFICATIONS FR");
 				recursiveParserQS(document, spath, "fr", labelMap_FR, ScreenTipMap_FR);
+			}
+			if (en) {
+				printLog(logFile, "START MODEL.XML MODIFICATIONS EN");
+				recursiveParserQS(document, spath, "en", labelMap_EN, ScreenTipMap_EN);
 			}
 			
 			try {
@@ -181,6 +225,7 @@ public class Main_CA_Parser_Encodage {
 
 				datas = StringUtils.replace(datas, outputSearch, outputReplace);
 			
+				printLog(logFile, "END MODEL.XML MODIFICATION : " + new java.util.Date().toString());
 				Files.write(output, datas.getBytes());
 
 			} catch (IOException e) {
@@ -194,8 +239,7 @@ public class Main_CA_Parser_Encodage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	System.out.println("END XML MODIFICATION");		
-		//publication
+	
 		
 	}
 	
@@ -209,6 +253,10 @@ public class Main_CA_Parser_Encodage {
 				
 		while (qsfname != null)
 		{
+			if (debug) {
+				printLog(logFile, "FIND QuerySubject Directory : " + qsfname.getStringValue());
+			}
+			
 			String nextFPath = spath + "/folder[" + j + "]";
 			recursiveParserQS(document, nextFPath, locale, labelMap, screenTiplMap);
 			j++;
@@ -217,7 +265,11 @@ public class Main_CA_Parser_Encodage {
 		
 		while (qsname != null)
 		{
-			System.out.println(qsname.getStringValue() + " *    *     *     *     *    * " + i /* + map.get(qsname.getStringValue())*/);  // clef de map
+			
+			if (debug) {
+				printLog(logFile, "FIND QuerySubject : " + qsname.getStringValue());
+			}
+			
 			String nextQIPath = spath + "/querySubject[" + i + "]";
 			recursiveParserQI(document, nextQIPath, locale, labelMap, screenTiplMap, qsname.getStringValue(), "");
 			i++;
@@ -238,15 +290,23 @@ public class Main_CA_Parser_Encodage {
 		
 		while (qifname != null)
 		{
-			System.out.println(" *   " + qifname.getStringValue() + " * * * * * * * " + qifNameLocale.getStringValue());  // clef de map
+			if (debug) {
+				printLog(logFile, "FIND QueryItem Folder : " + qifname.getStringValue() + " GET locale value : " + qifNameLocale.getStringValue());
+			}
 			
 			prefix = "(" + qifNameLocale.getStringValue() + ") ";
 			String nextsPath = spath + "/queryItemFolder[" + j + "]";
 			// cas de répertoires ou on a mis le TEC_PARTY
 			if (qifname.getStringValue().startsWith(".")) {
+				if (debug) {
+					printLog(logFile, " startsWith(\".\") : IT'S TEC_PARTY REFERENCE");
+				}
 				recursiveParserQI(document, nextsPath, locale, labelMap, screenTipMap, "TEC_PARTY", prefix);
 			}
 			else {
+				if (debug) {
+					printLog(logFile, "startsWith(\".\") : NO, IT'S NOT TEC_PARTY REFERENCE");
+				}
 				recursiveParserQI(document, nextsPath, locale, labelMap, screenTipMap, qsFinal, "");
 			}
 			// end cas TEC_PARTY
@@ -263,11 +323,15 @@ public class Main_CA_Parser_Encodage {
 			//Label
 			String label = prefix + labelMap.get(qsFinal + "." + fieldName);
 			if (labelMap.get(qsFinal + "." + fieldName) != null) {
+				if (debug) {
+					printLog(logFile, "Traduction exists : " + label  + " (" + fieldName + ")");
+				}
 				qiNameLocale.setText(label  + " (" + fieldName + ")");      // valeur de map
-				System.out.println(qiname.getStringValue() + " **** " + label + " (" + fieldName + ")");
 				} else {
-					qiNameLocale.setText(prefix + fieldName);
-					System.out.println(qiname.getStringValue() + " **** " + prefix + fieldName);
+					if (debug) {
+						printLog(logFile, "Traduction doesn't exist : " + prefix + " (" + fieldName + ")");
+					}
+					qiNameLocale.setText(prefix + " (" + fieldName + ")");
 				}
 			String desc = "";
 			if (screenTipMap.get(qsFinal + "." + fieldName) != null) {
@@ -275,6 +339,9 @@ public class Main_CA_Parser_Encodage {
 			}
 			String screenTip = "(" + qsFinal + "." + fieldName + ")" + desc;
 			if (qiScreenTipLocale != null) {
+				if (debug) {
+					printLog(logFile, qsFinal + "." + fieldName + " ScreenTip : " + screenTip);
+				}
 				qiScreenTipLocale.setText(screenTip);
 			}
 			i++;
@@ -286,35 +353,18 @@ public class Main_CA_Parser_Encodage {
 	}
 	
 	public static String replaceSpecialChar(String s) {
-		s = s.replaceAll("[\\u00c2\\u0092]", "'");		
+		s = s.replaceAll("[\\u00c2\\u0092]", "'");
 		return s;
 	}
 	
-	public static void printBytes(byte[] array, String name) {
-		   for (int k = 0; k < array.length; k++) {
-		       System.out.println(name + "[" + k + "] = " + "0x" +
-		           UnicodeFormatter.byteToHex(array[k]));
-		   }
+	public static void printLog(Path logFile, String printLog) {
+		System.out.println(printLog);	
+		printLog = printLog + "\n";
+		try {
+			Files.write(logFile, printLog.getBytes(), StandardOpenOption.APPEND);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		    public static class UnicodeFormatter  {
-		   	 
-		 	  static public String byteToHex(byte b) {
-		 	     // Returns hex String representation of byte b
-		 	     char hexDigit[] = {
-		 	        '0', '1', '2', '3', '4', '5', '6', '7',
-		 	        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-		 	     };
-		 	     char[] array = { hexDigit[(b >> 4) & 0x0f], hexDigit[b & 0x0f] };
-		 	     return new String(array);
-		 	  }
-		 	 
-		 	  static public String charToHex(char c) {
-		 	     // Returns hex String representation of char c
-		 	     byte hi = (byte) (c >>> 8);
-		 	     byte lo = (byte) (c & 0xff);
-		 	     return byteToHex(hi) + byteToHex(lo);
-		 	  }
-		 	 
-		 	} // class	   
+	}
 }

@@ -15,34 +15,25 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import com.cognos.developer.schemas.bibus._3.AddOptions;
-import com.cognos.developer.schemas.bibus._3.BaseClass;
 import com.cognos.developer.schemas.bibus._3.BiBusHeader;
-import com.cognos.developer.schemas.bibus._3.Folder;
-import com.cognos.developer.schemas.bibus._3.PropEnum;
-import com.cognos.developer.schemas.bibus._3.QueryOptions;
-import com.cognos.developer.schemas.bibus._3.SearchPathMultipleObject;
-import com.cognos.developer.schemas.bibus._3.SearchPathSingleObject;
-import com.cognos.developer.schemas.bibus._3.Sort;
-import com.cognos.developer.schemas.bibus._3.TokenProp;
-import com.cognos.developer.schemas.bibus._3.UpdateActionEnum;
 import com.cognos.developer.schemas.bibus._3.XmlEncodedXML;
+//import org.apache.axis.client.Stub;
 import com.cognos.org.apache.axis.client.Stub;
+//import org.apache.axis.message.SOAPHeaderElement;
 import com.cognos.org.apache.axis.message.SOAPHeaderElement;
 import com.dma.cognos.CRNConnect;
 
-import sapphire.util.Logger;
 
-public class CognosSVC {
+public class CognosSVC_CA {
 
 	private CRNConnect crnConnect;
 	private String modelPath;
 	private Map<String, Element> actionsMap;
 	private int i;
-	private String pathToXML;
+	private String pathToXML = "res";
 
 
-	public CognosSVC (String cognosDispatcher) {
+	public CognosSVC_CA (String cognosDispatcher) {
 		crnConnect = new CRNConnect();
 		crnConnect.setDispatcher(cognosDispatcher);
 		crnConnect.connectToCognosServer();
@@ -84,10 +75,10 @@ public class CognosSVC {
 			System.out.println("Logon successful as " + cognosLogin);
 
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 			ex.printStackTrace();
 		} catch (Exception ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 		return true;
 
@@ -99,7 +90,7 @@ public class CognosSVC {
 			crnConnect.getCMService().logoff();
 			System.out.println("logoff");
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 			ex.printStackTrace();
 		}
 
@@ -120,9 +111,9 @@ public class CognosSVC {
 			String res = crnConnect.getMetadataService().updateMetadata(xex).toString();
 			System.out.println("openModel" + modelPath + " successful");
 		} catch (DocumentException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 
 	}
@@ -140,9 +131,9 @@ public class CognosSVC {
 			String res = crnConnect.getMetadataService().updateMetadata(xex).toString();
 			System.out.println("saveModel " + modelPath);
 		} catch (DocumentException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 
 	}
@@ -161,9 +152,9 @@ public class CognosSVC {
 			String res = crnConnect.getMetadataService().updateMetadata(xex).toString();
 			System.out.println("closeModel " + modelPath);
 		} catch (DocumentException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 		}
 
 	}
@@ -219,59 +210,21 @@ public class CognosSVC {
 			String res = crnConnect.getMetadataService().updateMetadata(xex).toString();
 			
 		} catch (DocumentException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 			ex.printStackTrace();
 			saveModel();
 			closeModel();
-			logoff();   // ajout test Nico
-//			System.exit(0);
+			logoff();   
+
 		} catch (RemoteException ex) {
-			lg(ex.getMessage());
+			System.out.println(ex.getMessage());
 			ex.printStackTrace();
 			saveModel();
 			closeModel();
-			logoff();  // ajout test Nico
-//			System.exit(0);
+			logoff();  
+
 		}
 	}
 	
-	public void createPublicFolder(String newFolderName) {
-		PropEnum[] properties = new PropEnum[] { PropEnum.searchPath, PropEnum.defaultName };
 
-		AddOptions add = new AddOptions();
-		add.setUpdateAction(UpdateActionEnum.replace);
-
-		// create new folder object
-		Folder aFolder = new Folder();
-
-		TokenProp tp = new TokenProp();
-		tp.setValue(newFolderName);
-
-		aFolder.setDefaultName(tp);
-
-		SearchPathMultipleObject searchPath = new SearchPathMultipleObject();
-		searchPath.set_value("/content/folder[@name='" + newFolderName + "']");
-
-		try {
-			BaseClass[] folder = crnConnect.getCMService().query(searchPath, properties, new Sort[] {}, new QueryOptions());
-			// Check if the folder is already exist if not create it.
-			if (folder.length == 0) {
-				SearchPathSingleObject searchPathSing = new SearchPathSingleObject();
-				searchPathSing.set_value("/content");
-				crnConnect.getCMService().add(searchPathSing, new BaseClass[] { aFolder }, add);
-
-				System.out.println("New folder [" + newFolderName + "] has been created.");
-			} else {
-				System.out.println(newFolderName + " already exists.");
-			}
-		} catch (Exception e) {
-			System.out.println("Exception ");
-		}
-	}
-
-
-	
-	public static void lg(String msg) {
-		Logger.logInfo(" BuildModel.java ", msg);
-	}
 }
