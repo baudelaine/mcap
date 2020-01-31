@@ -31,7 +31,7 @@ public class Main_CA_PublishPackage2 {
 				properties.load(Main_CA_PublishPackage2.class.getClassLoader().getResourceAsStream("conf.properties"));
 			}
 			catch (NullPointerException npe) {
-				npe.printStackTrace();
+				throw new Exception("Error when loading conf.properties.");
 			}
 	        
 			 /*
@@ -49,7 +49,7 @@ public class Main_CA_PublishPackage2 {
 					Files.createFile(logFile);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new Exception("Error when creating log file.");
 				}
 	            logFile.toFile().setWritable(true);
 	        }
@@ -102,21 +102,21 @@ public class Main_CA_PublishPackage2 {
 	
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		finally{
 		}
 			
 	}
 	
-	public static void printLog(String printLog) {
+	public static void printLog(String printLog) throws Exception {
 		System.out.println(printLog);	
 		printLog = printLog + "\n";
 		try {
 			Files.write(logFile, printLog.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new Exception("Error when writing in log file.");
 		}
 	}
 	

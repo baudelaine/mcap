@@ -55,7 +55,7 @@ public class Main_CA_Parser_Encodage {
 				properties.load(Main_CA_Parser_Encodage.class.getClassLoader().getResourceAsStream("conf.properties"));
 			}
 			catch (NullPointerException npe) { 
-				npe.printStackTrace();
+				throw new Exception("Error when loading conf.properties.");
 			}
 
 		    /*
@@ -73,7 +73,7 @@ public class Main_CA_Parser_Encodage {
 					Files.createFile(logFile);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new Exception("Error when creating log file.");
 				}
 	            logFile.toFile().setWritable(true);
 	        }
@@ -160,7 +160,7 @@ public class Main_CA_Parser_Encodage {
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		finally{
 		}		
@@ -230,7 +230,7 @@ public class Main_CA_Parser_Encodage {
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new Exception("Error when writing to output file.")
 			}
 			
 			// fin test writer
@@ -357,14 +357,14 @@ public class Main_CA_Parser_Encodage {
 		return s;
 	}
 	
-	public static void printLog(Path logFile, String printLog) {
+	public static void printLog(Path logFile, String printLog) throws Exception{
 		System.out.println(printLog);	
 		printLog = printLog + "\n";
 		try {
 			Files.write(logFile, printLog.getBytes(), StandardOpenOption.APPEND);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new Exception("Error when writing to log file.")
 		}
 	}
 }
