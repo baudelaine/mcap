@@ -170,9 +170,10 @@ public class Main_CA_Parser_Encodage {
 		Path projectPath = Paths.get(javaModelsPath + "/" + projectName);
 		Charset charset = StandardCharsets.UTF_8;
 		
-		printLog(logFile, "START MODEL.XML MODIFICATIONS");
 		try {
-			
+
+			printLog(logFile, "START MODEL.XML MODIFICATIONS");
+
 			String modelSharedPath = projectPath + "/model.xml";
 			
 			Path input = Paths.get(modelSharedPath);
@@ -235,15 +236,15 @@ public class Main_CA_Parser_Encodage {
 			
 			// fin test writer
 			
-		} catch (DocumentException | IOException e ) {
+		} catch (Exception e ) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	
 		
 	}
 	
-	public static void recursiveParserQS(Document document, String spath, String locale, Map<String, String> labelMap, Map<String, String> screenTiplMap) {
+	public static void recursiveParserQS(Document document, String spath, String locale, Map<String, String> labelMap, Map<String, String> screenTiplMap) throws Exception {
 		
 		int i = 1;
 		Element qsname = (Element) document.selectSingleNode(spath + "/querySubject[" + i + "]/name");
@@ -277,7 +278,7 @@ public class Main_CA_Parser_Encodage {
 		}
 	}
 	
-	public static void recursiveParserQI(Document document, String spath, String locale, Map <String, String> labelMap, Map <String, String> screenTipMap, String qsFinal, String prefix) {
+	public static void recursiveParserQI(Document document, String spath, String locale, Map <String, String> labelMap, Map <String, String> screenTipMap, String qsFinal, String prefix) throws Exception {
 		
 		int i = 1;
 		Element qiname = (Element) document.selectSingleNode(spath + "/queryItem[" + i + "]/name");
