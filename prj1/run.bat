@@ -4,7 +4,7 @@ setlocal ENABLEDELAYEDEXPANSION
 set JAVA_HOME=jre
 set JAR_HOME=lib
 set CLASSPATH=.
-set MAIN_CLASS=com.dma.nicomains.Main_CA_PublishPackage_DataViz
+set MAIN_CLASS=com.dma.nicomains.Main_CA_PublishPackage2
 
 for /f "tokens=*" %%a in ('dir /b /a-d %JAR_HOME%\*.jar') do ( 
 	set JAR=%%a
